@@ -1,0 +1,34 @@
+# Entorno virtual (siempre se reconstruye dentro del contenedor)
+.venv/
+venv/
+
+# Base de datos local (se monta como volumen en producción)
+data/
+
+# Archivos de entorno (se configuran en Coolify)
+.env
+
+# Artefactos de Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Tests y cobertura
+tests/
+.coverage
+htmlcov/
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
+
+# Git
+.git/
+.gitignore
+
+# Logs
+*.log

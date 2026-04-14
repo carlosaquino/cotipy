@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cotipy API · Documentación</title>
+  <style>
+    :root {
+      --bg:        #0f172a;
+      --surface:   #1e293b;
+      --surface2:  #273549;
+      --border:    #334155;
+      --text:      #f1f5f9;
+      --muted:     #94a3b8;
+      --accent:    #38bdf8;
+      --green:     #4ade80;
+      --green-bg:  rgba(74,222,128,.12);
+      --red:       #f87171;
+      --yellow:    #fbbf24;
+      --code-bg:   #0d1929;
+      --sidebar-w: 264px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      font-size: 15px;
+    }
+
+    code {
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.83em;
+      background: rgba(255,255,255,0.07);
+      padding: 0.1em 0.35em;
+      border-radius: 3px;
+      color: var(--accent);
+    }
+
+    /* ── LAYOUT ─────────────────────────────────── */
+    .layout { display: flex; min-height: 100vh; }
+
+    /* ── SIDEBAR ─────────────────────────────────── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      overflow-y: auto;
+      z-index: 100;
+      padding-bottom: 2rem;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .sidebar-logo {
+      padding: 1.5rem 1.25rem 1.1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-logo img { height: 30px; display: block; }
+    .sidebar-api-label {
+      margin-top: 0.5rem;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .nav-group {
+      padding: 1.1rem 1.25rem 0.2rem;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .sidebar nav a {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.38rem 1.25rem;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      border-left: 2px solid transparent;
+      transition: color .14s, background .14s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sidebar nav a:hover { color: var(--text); background: rgba(255,255,255,.04); }
+    .sidebar nav a.active {
+      color: var(--accent);
+      border-left-color: var(--accent);
+      background: rgba(56,189,248,.08);
+    }
+
+    .badge-nav {
+      flex-shrink: 0;
+      font-size: 0.62rem;
+      padding: 0.08rem 0.3rem;
+      border-radius: 3px;
+      font-weight: 700;
+      font-family: monospace;
+      background: var(--green-bg);
+      color: var(--green);
+      border: 1px solid rgba(74,222,128,.25);
+    }
+
+    /* ── MAIN ────────────────────────────────────── */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      max-width: 880px;
+      padding: 3rem 3.5rem 5rem;
+    }
+
+    section { margin-bottom: 3.5rem; scroll-margin-top: 1.5rem; }
+
+    h1 { font-size: 2rem; font-weight: 700; letter-spacing: -.02em; margin-bottom: .6rem; }
+    h2 {
+      font-size: 1.3rem; font-weight: 600;
+      margin-bottom: 1rem;
+      padding-bottom: .5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    h3 { font-size: .95rem; font-weight: 600; margin: 1.4rem 0 .5rem; }
+
+    p { color: var(--muted); margin-bottom: .7rem; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── HERO ────────────────────────────────────── */
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      background: var(--green-bg);
+      color: var(--green);
+      font-size: .75rem;
+      font-weight: 600;
+      padding: .22rem .65rem;
+      border-radius: 99px;
+      border: 1px solid rgba(74,222,128,.25);
+      margin-bottom: 1rem;
+    }
+    .hero-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: blink 2s infinite;
+    }
+    @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:.35; } }
+
+    .hero-desc {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 580px;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn-row { display: flex; gap: .7rem; flex-wrap: wrap; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      padding: .48rem 1rem;
+      border-radius: 6px;
+      font-size: .875rem;
+      font-weight: 500;
+      transition: all .14s;
+      text-decoration: none !important;
+      cursor: pointer;
+    }
+    .btn-primary { background: var(--accent); color: #0f172a; }
+    .btn-primary:hover { background: #7dd3fc; }
+    .btn-outline { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .btn-outline:hover { background: var(--border); }
+
+    /* ── CARDS ───────────────────────────────────── */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 1rem;
+      margin: 1.3rem 0 1.6rem;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .9rem 1.1rem;
+    }
+    .card-icon { font-size: 1.2rem; margin-bottom: .4rem; }
+    .card-label { font-size: .68rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: .2rem; }
+    .card-value { font-size: .9rem; font-weight: 600; }
+
+    /* ── INFO BOX ────────────────────────────────── */
+    .info-box {
+      display: flex;
+      gap: .65rem;
+      background: rgba(56,189,248,.07);
+      border: 1px solid rgba(56,189,248,.22);
+      border-radius: 6px;
+      padding: .8rem 1rem;
+      font-size: .875rem;
+      color: var(--text);
+      margin: 1rem 0;
+    }
+    .info-box-icon { flex-shrink: 0; }
+
+    /* ── SOURCE GRID ─────────────────────────────── */
+    .source-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+    .source-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+    }
+    .source-name { font-weight: 600; font-size: .9rem; margin-bottom: .25rem; }
+    .source-id {
+      display: inline-block;
+      font-family: monospace;
+      font-size: .77rem;
+      color: var(--accent);
+      background: rgba(56,189,248,.09);
+      padding: .12rem .4rem;
+      border-radius: 3px;
+      margin-bottom: .5rem;
+    }
+    .source-desc { font-size: .82rem; color: var(--muted); }
+    .tags { margin-top: .45rem; display: flex; gap: .3rem; flex-wrap: wrap; }
+    .tag {
+      font-size: .63rem;
+      font-weight: 600;
+      padding: .1rem .38rem;
+      border-radius: 3px;
+    }
+    .tag-ref  { background: rgba(56,189,248,.12);  color: #38bdf8; }
+    .tag-cash { background: rgba(74,222,128,.12);  color: #4ade80; }
+    .tag-arb  { background: rgba(251,191,36,.12);  color: #fbbf24; }
+
+    /* ── ENDPOINT BLOCK ──────────────────────────── */
+    .endpoint {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+    .endpoint-header {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .85rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+    }
+    .method {
+      font-size: .68rem;
+      font-weight: 700;
+      padding: .18rem .5rem;
+      border-radius: 4px;
+      letter-spacing: .05em;
+      font-family: monospace;
+    }
+    .method-get {
+      background: rgba(74,222,128,.15);
+      color: #4ade80;
+      border: 1px solid rgba(74,222,128,.3);
+    }
+    .ep-path {
+      font-family: monospace;
+      font-size: .9rem;
+      color: var(--text);
+    }
+    .ep-body { padding: 1.25rem; }
+    .ep-desc { color: var(--muted); font-size: .9rem; margin-bottom: 1rem; }
+
+    /* ── TABLES ──────────────────────────────────── */
+    .table-label {
+      font-size: .67rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: .45rem;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: .84rem; margin-bottom: 1.2rem; }
+    th {
+      text-align: left;
+      padding: .45rem .75rem;
+      color: var(--muted);
+      font-size: .68rem;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      background: rgba(255,255,255,.03);
+      border-bottom: 1px solid var(--border);
+    }
+    td { padding: .48rem .75rem; border-bottom: 1px solid rgba(51,65,85,.5); vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    .p-name { font-family: monospace; color: var(--accent); white-space: nowrap; }
+    .p-type { font-family: monospace; font-size: .77rem; color: var(--yellow); }
+    .p-desc { color: var(--muted); }
+    .badge-opt { font-size: .62rem; padding: .08rem .28rem; background: rgba(148,163,184,.1); color: var(--muted); border-radius: 3px; margin-left: .3rem; }
+    .badge-req { font-size: .62rem; padding: .08rem .28rem; background: rgba(248,113,113,.1); color: var(--red); border-radius: 3px; margin-left: .3rem; }
+
+    /* ── CODE BLOCKS ─────────────────────────────── */
+    .code-block {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      margin: .7rem 0;
+      overflow: hidden;
+    }
+    .code-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: .42rem .9rem;
+      border-bottom: 1px solid var(--border);
+      font-size: .7rem;
+      color: var(--muted);
+      letter-spacing: .05em;
+    }
+    .copy-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      cursor: pointer;
+      font-size: .7rem;
+      padding: .18rem .55rem;
+      border-radius: 4px;
+      transition: all .14s;
+      font-family: inherit;
+    }
+    .copy-btn:hover  { border-color: var(--accent); color: var(--accent); }
+    .copy-btn.copied { border-color: var(--green);  color: var(--green); }
+    pre {
+      padding: .95rem 1rem;
+      overflow-x: auto;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: .81rem;
+      line-height: 1.65;
+      color: #e2e8f0;
+    }
+
+    /* JSON / curl coloring */
+    .jk  { color: #93c5fd; }   /* key   */
+    .js  { color: #86efac; }   /* string */
+    .jn  { color: #fbbf24; }   /* number */
+    .jb  { color: #f87171; }   /* bool  */
+    .jz  { color: #64748b; }   /* null  */
+    .cc  { color: #c084fc; }   /* curl cmd */
+    .cu  { color: #86efac; }   /* url   */
+    .cf  { color: #38bdf8; }   /* flag  */
+    .cm  { color: #4b5568; font-style: italic; }  /* comment */
+
+    /* ── CREDITS ─────────────────────────────────── */
+    .credits-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 3rem 2.5rem;
+      text-align: center;
+    }
+    .credits-card img { height: 52px; margin-bottom: 1.25rem; }
+    .credits-divider {
+      width: 36px; height: 2px;
+      background: var(--accent);
+      border-radius: 1px;
+      margin: 1rem auto 1.25rem;
+    }
+    .credits-card h2 { border: none; text-align: center; margin-bottom: .5rem; }
+    .credits-card p { max-width: 440px; margin: 0 auto 1.5rem; text-align: center; }
+
+    /* ── FOOTER ──────────────────────────────────── */
+    footer {
+      margin-top: 4rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: .8rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: .5rem;
+    }
+
+    /* ── RESPONSIVE ──────────────────────────────── */
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 2rem 1.25rem 4rem; }
+      h1 { font-size: 1.6rem; }
+      .cards { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <img src="/recursos/logo_ipyahu.png" alt="IPYAHU">
+      <div class="sidebar-api-label">Cotipy API &middot; v0.1.0</div>
+    </div>
+    <nav>
+      <div class="nav-group">Introducción</div>
+      <a href="#inicio">Inicio</a>
+      <a href="#inicio-rapido">Inicio rápido</a>
+      <a href="#fuentes">Fuentes de datos</a>
+      <a href="#tipos">Tipos y modelos</a>
+
+      <div class="nav-group">Cotizaciones</div>
+      <a href="#ep-todas"><span class="badge-nav">GET</span>Todas las cotizaciones</a>
+      <a href="#ep-moneda"><span class="badge-nav">GET</span>Por moneda</a>
+      <a href="#ep-fuente"><span class="badge-nav">GET</span>Por fuente</a>
+
+      <div class="nav-group">Historial</div>
+      <a href="#ep-historial"><span class="badge-nav">GET</span>Historial de moneda</a>
+      <a href="#ep-diario"><span class="badge-nav">GET</span>Promedios diarios</a>
+
+      <div class="nav-group">Sistema</div>
+      <a href="#ep-health"><span class="badge-nav">GET</span>Health check</a>
+
+      <div class="nav-group">Acerca de</div>
+      <a href="#creditos">Desarrollado por IPYAHU</a>
+    </nav>
+  </aside>
+
+  <!-- ═══════════════════ MAIN ═══════════════════════ -->
+  <main class="main">
+
+    <!-- ── INICIO ───────────────────────────────── -->
+    <section id="inicio">
+      <div class="hero-badge">
+        <span class="hero-dot"></span>
+        API activa &middot; v0.1.0
+      </div>
+      <h1>Cotipy API</h1>
+      <p class="hero-desc">
+        API RESTful que sirve cotizaciones de monedas del Paraguay en tiempo real,
+        obtenidas de tres fuentes oficiales: BCP, Maxicambios y Cambios Chaco.
+        Caché inteligente, historial persistido y respuestas en JSON.
+      </p>
+      <div class="btn-row">
+        <a href="/docs"   class="btn btn-primary">Swagger UI &rarr;</a>
+        <a href="/redoc"  class="btn btn-outline">ReDoc</a>
+        <a href="#inicio-rapido" class="btn btn-outline">Empezar</a>
+      </div>
+    </section>
+
+    <!-- ── INICIO RÁPIDO ─────────────────────────── -->
+    <section id="inicio-rapido">
+      <h2>Inicio rápido</h2>
+      <p>
+        No se requiere autenticación. Todas las respuestas son JSON con campos en español.
+        El primer request scrapea las fuentes en paralelo; los subsiguientes se sirven desde
+        caché (TTL configurable, por defecto 5 minutos).
+      </p>
+
+      <div class="cards">
+        <div class="card">
+          <div class="card-icon">🔗</div>
+          <div class="card-label">Base URL</div>
+          <div class="card-value" style="font-family:monospace;font-size:.77rem">https://tu-dominio.com</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">🔓</div>
+          <div class="card-label">Autenticación</div>
+          <div class="card-value">No requerida</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">📦</div>
+          <div class="card-label">Formato</div>
+          <div class="card-value">JSON · UTF-8</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">⚡</div>
+          <div class="card-label">Caché TTL</div>
+          <div class="card-value">5 minutos</div>
+        </div>
+      </div>
+
+      <h3>Tu primera solicitud</h3>
+      <div class="code-block">
+        <div class="code-top">
+          <span>BASH</span>
+          <button class="copy-btn" data-copy="curl https://tu-dominio.com/api/v1/cotizaciones">Copiar</button>
+        </div>
+        <pre><span class="cc">curl</span> https://tu-dominio.com<span class="cu">/api/v1/cotizaciones</span></pre>
+      </div>
+
+      <div class="info-box">
+        <span class="info-box-icon">ℹ️</span>
+        <span>
+          Si el scraper de alguna fuente falla, la API retorna la última caché disponible
+          con el campo <code>desactualizado: true</code> en lugar de un error 503.
+          Solo se retorna 503 cuando <em>todas</em> las fuentes fallan simultáneamente.
+        </span>
+      </div>
+    </section>
+
+    <!-- ── FUENTES ───────────────────────────────── -->
+    <section id="fuentes">
+      <h2>Fuentes de datos</h2>
+      <p>
+        Cotipy obtiene cotizaciones de tres fuentes paraguayas en paralelo.
+        Cada fuente se identifica con el valor del parámetro <code>fuente</code>.
+      </p>
+
+      <div class="source-grid">
+        <div class="source-card">
+          <div class="source-name">Banco Central del Paraguay</div>
+          <div class="source-id">bcp</div>
+          <div class="source-desc">Tasas referenciales oficiales. 26 monedas. Sin sucursales. Solo campo <code>referencial</code>.</div>
+          <div class="tags"><span class="tag tag-ref">referencial</span></div>
+        </div>
+        <div class="source-card">
+          <div class="source-name">Maxicambios</div>
+          <div class="source-id">maxicambios</div>
+          <div class="source-desc">Compra/venta y arbitraje. 4 sucursales: Asunción, CDE, Cheques y Arbitraje.</div>
+          <div class="tags"><span class="tag tag-cash">efectivo</span><span class="tag tag-arb">arbitraje</span></div>
+        </div>
+        <div class="source-card">
+          <div class="source-name">Cambios Chaco</div>
+          <div class="source-id">cambios_chaco</div>
+          <div class="source-desc">Compra/venta y arbitraje. 27 monedas disponibles.</div>
+          <div class="tags"><span class="tag tag-cash">efectivo</span><span class="tag tag-arb">arbitraje</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── TIPOS ─────────────────────────────────── -->
+    <section id="tipos">
+      <h2>Tipos y modelos</h2>
+
+      <h3>SourceName — Fuente</h3>
+      <table>
+        <thead><tr><th>Valor</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td class="p-name">"bcp"</td><td class="p-desc">Banco Central del Paraguay</td></tr>
+          <tr><td class="p-name">"maxicambios"</td><td class="p-desc">Maxicambios (4 sucursales)</td></tr>
+          <tr><td class="p-name">"cambios_chaco"</td><td class="p-desc">Cambios Chaco</td></tr>
+        </tbody>
+      </table>
+
+      <h3>RateType — Tipo de cotización</h3>
+      <table>
+        <thead><tr><th>Valor</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td class="p-name">"referencial"</td><td class="p-desc">Tasa referencial del BCP. Sin compra/venta; solo campo <code>referencial</code>.</td></tr>
+          <tr><td class="p-name">"efectivo"</td><td class="p-desc">Compra y venta en efectivo de casas de cambio.</td></tr>
+          <tr><td class="p-name">"arbitraje"</td><td class="p-desc">Tasas cruzadas de arbitraje.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Modelo CurrencyRate — cotización individual</h3>
+      <div class="code-block">
+        <div class="code-top"><span>JSON</span></div>
+        <pre>{
+  <span class="jk">"moneda"</span>:      <span class="js">"USD"</span>,                  <span class="cm">// Código ISO 4217</span>
+  <span class="jk">"nombre"</span>:      <span class="js">"Dólar Estadounidense"</span>,
+  <span class="jk">"compra"</span>:      <span class="jn">6300.0</span>,                 <span class="cm">// null para BCP</span>
+  <span class="jk">"venta"</span>:       <span class="jn">6400.0</span>,                 <span class="cm">// null para BCP</span>
+  <span class="jk">"referencial"</span>: <span class="jz">null</span>,                   <span class="cm">// solo BCP</span>
+  <span class="jk">"tipo"</span>:        <span class="js">"efectivo"</span>,             <span class="cm">// referencial | efectivo | arbitraje</span>
+  <span class="jk">"fuente"</span>:      <span class="js">"maxicambios"</span>,          <span class="cm">// bcp | maxicambios | cambios_chaco</span>
+  <span class="jk">"sucursal"</span>:    <span class="js">"asuncion"</span>              <span class="cm">// null si no aplica</span>
+}</pre>
+      </div>
+
+      <h3>Sucursales de Maxicambios</h3>
+      <table>
+        <thead><tr><th>Valor</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td class="p-name">"asuncion"</td><td class="p-desc">Casa central, Asunción</td></tr>
+          <tr><td class="p-name">"cde"</td><td class="p-desc">Ciudad del Este</td></tr>
+          <tr><td class="p-name">"cheques"</td><td class="p-desc">Tasas para cheques</td></tr>
+          <tr><td class="p-name">"arbitraje"</td><td class="p-desc">Tasas de arbitraje</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ── EP: TODAS ─────────────────────────────── -->
+    <section id="ep-todas">
+      <h2>Cotizaciones en vivo</h2>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method method-get">GET</span>
+          <code class="ep-path">/api/v1/cotizaciones</code>
+        </div>
+        <div class="ep-body">
+          <p class="ep-desc">
+            Retorna las cotizaciones actuales de todas las fuentes activas (o de una fuente específica
+            si se pasa el parámetro <code>fuente</code>). Las fuentes se scrapen en paralelo.
+            Cada respuesta exitosa guarda los datos en la base de historial de forma asíncrona.
+          </p>
+
+          <div class="table-label">Parámetros de consulta (todos opcionales)</div>
+          <table>
+            <thead><tr><th>Parámetro</th><th>Tipo</th><th>Descripción</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="p-name">fuente</span><span class="badge-opt">opcional</span></td>
+                <td><span class="p-type">SourceName</span></td>
+                <td class="p-desc">Limitar a una fuente: <code>bcp</code>, <code>maxicambios</code>, <code>cambios_chaco</code></td>
+              </tr>
+              <tr>
+                <td><span class="p-name">tipo</span><span class="badge-opt">opcional</span></td>
+                <td><span class="p-type">RateType</span></td>
+                <td class="p-desc">Filtrar por tipo: <code>referencial</code>, <code>efectivo</code>, <code>arbitraje</code></td>
+              </tr>
+              <tr>
+                <td><span class="p-name">sucursal</span><span class="badge-opt">opcional</span></td>
+                <td><span class="p-type">string</span></td>
+                <td class="p-desc">Filtrar por sucursal: <code>asuncion</code>, <code>cde</code>, <code>cheques</code>, <code>arbitraje</code></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>Ejemplos</h3>
+          <div class="code-block">
+            <div class="code-top">
+              <span>BASH</span>
+              <button class="copy-btn" data-copy="curl https://tu-dominio.com/api/v1/cotizaciones">Copiar</button>
+            </div>
+            <pre><span class="cm"># Todas las fuentes</span>
+<span class="cc">curl</span> https://tu-dominio.com<span class="cu">/api/v1/cotizaciones</span>
+
+<span class="cm"># Solo BCP</span>
+<span class="cc">curl</span> https://tu-dominio.com<span class="cu">/api/v1/cotizaciones</span><span class="cf">?fuente=bcp</span>
+
+<span class="cm"># Compra/venta en Asunción (Maxicambios)</span>
+<span class="cc">curl</span> https://tu-dominio.com<span class="cu">/api/v1/cotizaciones</span><span class="cf">?tipo=efectivo&amp;sucursal=asuncion</span></pre>
+          </div>
+
+          <h3>Respuesta</h3>
+          <div class="code-block">
+            <div class="code-top"><span>JSON &middot; 200 OK</span></div>
+            <pre>{
+  <span class="jk">"fuentes"</span>: [
+    {
+      <span class="jk">"fuente"</span>:         <span class="js">"bcp"</span>,
+      <span class="jk">"cotizaciones"</span>:  [
+        {
+          <span class="jk">"moneda"</span>:      <span class="js">"USD"</span>,
+          <span class="jk">"nombre"</span>:      <span class="js">"Dólar Estadounidense"</span>,
+          <span class="jk">"compra"</span>:      <span class="jz">null</span>,
+          <span class="jk">"venta"</span>:       <span class="jz">null</span>,
+          <span class="jk">"referencial"</span>: <span class="jn">6416.86</span>,
+          <span class="jk">"tipo"</span>:        <span class="js">"referencial"</span>,
+          <span class="jk">"fuente"</span>:      <span class="js">"bcp"</span>,
+          <span class="jk">"sucursal"</span>:    <span class="jz">null</span>
+        }
+        <span class="cm">// ... 25 monedas más</span>
+      ],
+      <span class="jk">"actualizado_en"</span>: <span class="js">"2026-04-14T03:00:00Z"</span>,
+      <span class="jk">"desactualizado"</span>: <span class="jb">false</span>,
+      <span class="jk">"error"</span>:          <span class="jz">null</span>
+    },
+    <span class="cm">// ... maxicambios, cambios_chaco</span>
+  ],
+  <span class="jk">"actualizado_en"</span>: <span class="js">"2026-04-14T03:00:00Z"</span>
+}</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── EP: POR MONEDA ────────────────────────── -->
+    <section id="ep-moneda">
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method method-get">GET</span>
+          <code class="ep-path">/api/v1/cotizaciones/{moneda}</code>
+        </div>
+        <div class="ep-body">
+          <p class="ep-desc">
+            Retorna las cotizaciones de una moneda específica en todas las fuentes activas.
+            Usar el código ISO 4217 en cualquier capitalización (<code>USD</code>, <code>eur</code>, <code>BRL</code>).
+          </p>
+
+          <div class="table-label">Parámetro de ruta</div>
+          <table>
+            <thead><tr><th>Parámetro</th><th>Tipo</th><th>Descripción</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="p-name">moneda</span><span class="badge-req">requerido</span></td>
+                <td><span class="p-type">string</span></td>
+                <td class="p-desc">Código ISO 4217: <code>USD</code>, <code>EUR</code>, <code>BRL</code>, <code>ARS</code>, <code>JPY</code>…</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>Ejemplos</h3>
+          <div class="code-block">
+            <div class="code-top">
+              <span>BASH</span>
+              <button class="copy-btn" data-copy="curl https://tu-dominio.com/api/v1/cotizaciones/USD">Copiar</button>
+            </div>
+            <pre><span class="cc">curl</span> https://tu-dominio.com<span class="cu">/api/v1/cotizaciones/USD</span>
+
+<span class="cc">curl</span> https://tu-dominio.com<span class="cu">/api/v1/cotizaciones/EUR</span>
+
+<span class="cc">curl</span> https://tu-dominio.com<span class="cu">/api/v1/cotizaciones/BRL</span></pre>
+          </div>
+
+          <h3>Respuesta</h3>
+          <div class="code-block">
+            <div class="code-top"><span>JSON &middot; 200 OK</span></div>
+            <pre>{
+  <span class="jk">"fuentes"</span>: [
+    {
+      <span class="jk">"fuente"</span>: <span class="js">"maxicambios"</span>,
+      <span class="jk">"cotizaciones"</span>: [
+        {
+          <span class="jk">"moneda"</span>:   <span class="js">"USD"</span>,
+          <span class="jk">"nombre"</span>:   <span class="js">"Dólar"</span>,
+          <span class="jk">"compra"</span>:   <span class="jn">6300.0</span>,
+          <span class="jk">"venta"</span>:    <span class="jn">6400.0</span>,
+          <span class="jk">"tipo"</span>:     <span class="js">"efectivo"</span>,
+          <span class="jk">"fuente"</span>:   <span class="js">"maxicambios"</span>,
+          <span class="jk">"sucursal"</span>: <span class="js">"asuncion"</span>
+        },
+        {
+          <span class="jk">"moneda"</span>:   <span class="js">"USD"</span>,
+          <span class="jk">"nombre"</span>:   <span class="js">"Dólar"</span>,
+          <span class="jk">"compra"</span>:   <span class="jn">6280.0</span>,
+          <span class="jk">"venta"</span>:    <span class="jn">6400.0</span>,
+          <span class="jk">"tipo"</span>:     <span class="js">"efectivo"</span>,
+          <span class="jk">"fuente"</span>:   <span class="js">"maxicambios"</span>,
+          <span class="jk">"sucursal"</span>: <span class="js">"cde"</span>
+        }
+      ],
+      <span class="jk">"desactualizado"</span>: <span class="jb">false</span>,
+      <span class="jk">"error"</span>: <span class="jz">null</span>
+    }
+  ],
+  <span class="jk">"actualizado_en"</span>: <span class="js">"2026-04-14T03:00:00Z"</span>
+}</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── EP: POR FUENTE ────────────────────────── -->
+    <section id="ep-fuente">
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method method-get">GET</span>
+          <code class="ep-path">/api/v1/cotizaciones/sources/{fuente}</code>
+        </div>
+        <div class="ep-body">
+          <p class="ep-desc">
+            Retorna todas las cotizaciones de una fuente específica.
+            Equivale a <code>/api/v1/cotizaciones?fuente=…</code> pero en formato <code>SourceResult</code>
+            plano (sin el envoltorio de lista de fuentes).
+          </p>
+
+          <div class="table-label">Parámetro de ruta</div>
+          <table>
+            <thead><tr><th>Parámetro</th><th>Tipo</th><th>Descripción</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="p-name">fuente</span><span class="badge-req">requerido</span></td>
+                <td><span class="p-type">SourceName</span></td>
+                <td class="p-desc"><code>bcp</code> &middot; <code>maxicambios</code> &middot; <code>cambios_chaco</code></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>Ejemplos</h3>
+          <div class="code-block">
+            <div class="code-top">
+              <span>BASH</span>
+              <button class="copy-btn" data-copy="curl https://tu-dominio.com/api/v1/cotizaciones/sources/bcp">Copiar</button>
+            </div>
+            <pre><span class="cc">curl</span> https://tu-dominio.com<span class="cu">/api/v1/cotizaciones/sources/bcp</span>
+
+<span class="cc">curl</span> https://tu-dominio.com<span class="cu">/api/v1/cotizaciones/sources/maxicambios</span>
+
+<span class="cc">curl</span> https://tu-dominio.com<span class="cu">/api/v1/cotizaciones/sources/cambios_chaco</span></pre>
+          </div>
+
+          <h3>Respuesta</h3>
+          <div class="code-block">
+            <div class="code-top"><span>JSON &middot; 200 OK</span></div>
+            <pre>{
+  <span class="jk">"fuente"</span>:        <span class="js">"cambios_chaco"</span>,
+  <span class="jk">"cotizaciones"</span>:  [ <span class="cm">/* lista de CurrencyRate */</span> ],
+  <span class="jk">"actualizado_en"</span>: <span class="js">"2026-04-14T03:00:00Z"</span>,
+  <span class="jk">"desactualizado"</span>: <span class="jb">false</span>,
+  <span class="jk">"error"</span>:          <span class="jz">null</span>
+}</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── HISTORIAL ──────────────────────────────── -->
+    <section id="ep-historial">
+      <h2>Historial</h2>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method method-get">GET</span>
+          <code class="ep-path">/api/v1/historial/{moneda}</code>
+        </div>
+        <div class="ep-body">
+          <p class="ep-desc">
+            Retorna el historial de cotizaciones almacenadas en base de datos para una moneda.
+            Cada registro corresponde a una cotización guardada durante un scrape o refresco automático.
+            Los resultados vienen ordenados del más reciente al más antiguo.
+          </p>
+
+          <div class="table-label">Parámetro de ruta</div>
+          <table>
+            <thead><tr><th>Parámetro</th><th>Tipo</th><th>Descripción</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="p-name">moneda</span><span class="badge-req">requerido</span></td>
+                <td><span class="p-type">string</span></td>
+                <td class="p-desc">Código ISO 4217 (<code>USD</code>, <code>EUR</code>, <code>BRL</code>…)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="table-label">Parámetros de consulta (todos opcionales)</div>
+          <table>
+            <thead><tr><th>Parámetro</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="p-name">fuente</span></td>
+                <td><span class="p-type">SourceName</span></td>
+                <td class="p-desc">—</td>
+                <td class="p-desc">Filtrar por fuente</td>
+              </tr>
+              <tr>
+                <td><span class="p-name">fecha_desde</span></td>
+                <td><span class="p-type">date</span></td>
+                <td class="p-desc">—</td>
+                <td class="p-desc">Inicio del rango. Formato <code>YYYY-MM-DD</code></td>
+              </tr>
+              <tr>
+                <td><span class="p-name">fecha_hasta</span></td>
+                <td><span class="p-type">date</span></td>
+                <td class="p-desc">—</td>
+                <td class="p-desc">Fin del rango. Formato <code>YYYY-MM-DD</code></td>
+              </tr>
+              <tr>
+                <td><span class="p-name">sucursal</span></td>
+                <td><span class="p-type">string</span></td>
+                <td class="p-desc">—</td>
+                <td class="p-desc">Filtrar por sucursal</td>
+              </tr>
+              <tr>
+                <td><span class="p-name">limite</span></td>
+                <td><span class="p-type">integer</span></td>
+                <td class="p-desc"><code>100</code></td>
+                <td class="p-desc">Máximo de registros. Rango: 1 – 500</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>Ejemplos</h3>
+          <div class="code-block">
+            <div class="code-top">
+              <span>BASH</span>
+              <button class="copy-btn" data-copy="curl https://tu-dominio.com/api/v1/historial/USD?fecha_desde=2026-04-01&limite=50">Copiar</button>
+            </div>
+            <pre><span class="cm"># Últimos 100 registros de USD</span>
+<span class="cc">curl</span> https://tu-dominio.com<span class="cu">/api/v1/historial/USD</span>
+
+<span class="cm"># USD desde el 1 de abril, máximo 50</span>
+<span class="cc">curl</span> https://tu-dominio.com<span class="cu">/api/v1/historial/USD</span><span class="cf">?fecha_desde=2026-04-01&amp;limite=50</span>
+
+<span class="cm"># USD de Maxicambios Asunción</span>
+<span class="cc">curl</span> https://tu-dominio.com<span class="cu">/api/v1/historial/USD</span><span class="cf">?fuente=maxicambios&amp;sucursal=asuncion</span></pre>
+          </div>
+
+          <h3>Respuesta</h3>
+          <div class="code-block">
+            <div class="code-top"><span>JSON &middot; 200 OK</span></div>
+            <pre>{
+  <span class="jk">"moneda"</span>:   <span class="js">"USD"</span>,
+  <span class="jk">"total"</span>:    <span class="jn">248</span>,          <span class="cm">// total en DB (sin aplicar limite)</span>
+  <span class="jk">"registros"</span>: [
+    {
+      <span class="jk">"id"</span>:            <span class="jn">53</span>,
+      <span class="jk">"moneda"</span>:        <span class="js">"USD"</span>,
+      <span class="jk">"nombre"</span>:        <span class="js">"Dólar Estadounidense"</span>,
+      <span class="jk">"fuente"</span>:        <span class="js">"bcp"</span>,
+      <span class="jk">"compra"</span>:        <span class="jz">null</span>,
+      <span class="jk">"venta"</span>:         <span class="jz">null</span>,
+      <span class="jk">"referencial"</span>:   <span class="jn">6416.86</span>,
+      <span class="jk">"tipo"</span>:          <span class="js">"referencial"</span>,
+      <span class="jk">"sucursal"</span>:      <span class="jz">null</span>,
+      <span class="jk">"registrado_en"</span>: <span class="js">"2026-04-14T03:00:00Z"</span>
+    }
+    <span class="cm">// ... hasta `limite` registros</span>
+  ]
+}</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── EP: DIARIO ────────────────────────────── -->
+    <section id="ep-diario">
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method method-get">GET</span>
+          <code class="ep-path">/api/v1/historial/{moneda}/diario</code>
+        </div>
+        <div class="ep-body">
+          <p class="ep-desc">
+            Retorna los promedios diarios de compra, venta y referencial para una moneda,
+            agrupados por día, fuente y sucursal. Útil para construir gráficos de tendencia histórica.
+          </p>
+
+          <div class="table-label">Parámetro de ruta</div>
+          <table>
+            <thead><tr><th>Parámetro</th><th>Tipo</th><th>Descripción</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="p-name">moneda</span><span class="badge-req">requerido</span></td>
+                <td><span class="p-type">string</span></td>
+                <td class="p-desc">Código ISO 4217</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="table-label">Parámetros de consulta (todos opcionales)</div>
+          <table>
+            <thead><tr><th>Parámetro</th><th>Tipo</th><th>Descripción</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="p-name">fuente</span></td>
+                <td><span class="p-type">SourceName</span></td>
+                <td class="p-desc">Filtrar por fuente</td>
+              </tr>
+              <tr>
+                <td><span class="p-name">fecha_desde</span></td>
+                <td><span class="p-type">date</span></td>
+                <td class="p-desc">Inicio del rango <code>YYYY-MM-DD</code></td>
+              </tr>
+              <tr>
+                <td><span class="p-name">fecha_hasta</span></td>
+                <td><span class="p-type">date</span></td>
+                <td class="p-desc">Fin del rango <code>YYYY-MM-DD</code></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>Ejemplo</h3>
+          <div class="code-block">
+            <div class="code-top">
+              <span>BASH</span>
+              <button class="copy-btn" data-copy="curl https://tu-dominio.com/api/v1/historial/USD/diario?fecha_desde=2026-04-01">Copiar</button>
+            </div>
+            <pre><span class="cc">curl</span> https://tu-dominio.com<span class="cu">/api/v1/historial/USD/diario</span><span class="cf">?fecha_desde=2026-04-01</span></pre>
+          </div>
+
+          <h3>Respuesta</h3>
+          <div class="code-block">
+            <div class="code-top"><span>JSON &middot; 200 OK</span></div>
+            <pre>{
+  <span class="jk">"moneda"</span>: <span class="js">"USD"</span>,
+  <span class="jk">"promedios"</span>: [
+    {
+      <span class="jk">"fecha"</span>:                <span class="js">"2026-04-14"</span>,
+      <span class="jk">"fuente"</span>:               <span class="js">"bcp"</span>,
+      <span class="jk">"moneda"</span>:               <span class="js">"USD"</span>,
+      <span class="jk">"compra_promedio"</span>:      <span class="jz">null</span>,
+      <span class="jk">"venta_promedio"</span>:       <span class="jz">null</span>,
+      <span class="jk">"referencial_promedio"</span>: <span class="jn">6416.86</span>,
+      <span class="jk">"sucursal"</span>:             <span class="jz">null</span>
+    },
+    {
+      <span class="jk">"fecha"</span>:                <span class="js">"2026-04-14"</span>,
+      <span class="jk">"fuente"</span>:               <span class="js">"maxicambios"</span>,
+      <span class="jk">"moneda"</span>:               <span class="js">"USD"</span>,
+      <span class="jk">"compra_promedio"</span>:      <span class="jn">6300.0</span>,
+      <span class="jk">"venta_promedio"</span>:       <span class="jn">6400.0</span>,
+      <span class="jk">"referencial_promedio"</span>: <span class="jz">null</span>,
+      <span class="jk">"sucursal"</span>:             <span class="js">"asuncion"</span>
+    }
+  ]
+}</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── EP: HEALTH ────────────────────────────── -->
+    <section id="ep-health">
+      <h2>Health Check</h2>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method method-get">GET</span>
+          <code class="ep-path">/health</code>
+        </div>
+        <div class="ep-body">
+          <p class="ep-desc">
+            Retorna el estado de salud de la aplicación: disponibilidad del caché de cada fuente
+            y estado de la base de datos. Sin parámetros. Ideal para liveness probes en Docker o Coolify.
+          </p>
+
+          <h3>Ejemplo</h3>
+          <div class="code-block">
+            <div class="code-top">
+              <span>BASH</span>
+              <button class="copy-btn" data-copy="curl https://tu-dominio.com/health">Copiar</button>
+            </div>
+            <pre><span class="cc">curl</span> https://tu-dominio.com<span class="cu">/health</span></pre>
+          </div>
+
+          <h3>Respuesta</h3>
+          <div class="code-block">
+            <div class="code-top"><span>JSON &middot; 200 OK</span></div>
+            <pre>{
+  <span class="jk">"estado"</span>:        <span class="js">"ok"</span>,
+  <span class="jk">"version"</span>:       <span class="js">"0.1.0"</span>,
+  <span class="jk">"fuentes"</span>: {
+    <span class="jk">"bcp"</span>:           <span class="js">"ok"</span>,
+    <span class="jk">"maxicambios"</span>:   <span class="js">"ok"</span>,
+    <span class="jk">"cambios_chaco"</span>: <span class="js">"ok"</span>
+  },
+  <span class="jk">"base_de_datos"</span>: <span class="js">"ok"</span>
+}</pre>
+          </div>
+
+          <h3>Estados posibles por fuente</h3>
+          <table>
+            <thead><tr><th>Valor</th><th>Significado</th></tr></thead>
+            <tbody>
+              <tr><td class="p-name" style="color:var(--green)">"ok"</td><td class="p-desc">Caché vigente disponible (TTL no vencido)</td></tr>
+              <tr><td class="p-name" style="color:var(--yellow)">"desactualizado"</td><td class="p-desc">Solo caché vencida disponible (el último scrape falló)</td></tr>
+              <tr><td class="p-name" style="color:var(--red)">"error"</td><td class="p-desc">Sin datos disponibles en caché</td></tr>
+              <tr><td class="p-name" style="color:var(--muted)">"deshabilitado"</td><td class="p-desc">Fuente desactivada por configuración de entorno</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CRÉDITOS ──────────────────────────────── -->
+    <section id="creditos">
+      <div class="credits-card">
+        <img src="/recursos/logo_ipyahu.png" alt="IPYAHU">
+        <div class="credits-divider"></div>
+        <h2>Desarrollado por IPYAHU</h2>
+        <p>
+          Cotipy es un proyecto open source desarrollado por el equipo de IPYAHU,
+          enfocado en soluciones tecnológicas para el ecosistema paraguayo.
+        </p>
+        <div class="btn-row" style="justify-content:center">
+          <a href="https://ipyahu.com" class="btn btn-primary" target="_blank" rel="noopener">
+            ipyahu.com &rarr;
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <span>Cotipy API v0.1.0 &middot; Desarrollado por <strong>IPYAHU</strong></span>
+      <span>
+        <a href="/docs">Swagger UI</a> &middot;
+        <a href="/redoc">ReDoc</a>
+      </span>
+    </footer>
+
+  </main>
+</div>
+
+<script>
+  // ── Active sidebar link via IntersectionObserver ──
+  const sections  = document.querySelectorAll('section[id]');
+  const navLinks  = document.querySelectorAll('.sidebar nav a[href^="#"]');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => {
+          link.classList.toggle('active',
+            link.getAttribute('href') === '#' + entry.target.id);
+        });
+      }
+    });
+  }, { threshold: 0.2, rootMargin: '-5% 0px -65% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+
+  // ── Copy buttons ──────────────────────────────────
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const text = btn.dataset.copy
+        || btn.closest('.code-block').querySelector('pre').innerText;
+      try {
+        await navigator.clipboard.writeText(text);
+        btn.textContent = '✓ Copiado';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = 'Copiar';
+          btn.classList.remove('copied');
+        }, 2000);
+      } catch (_) {}
+    });
+  });
+</script>
+</body>
+</html>
